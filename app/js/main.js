@@ -1,17 +1,32 @@
 (function() {
-	// ViewModel を定義します
-	var ViewModel = function(first, last) {
-	    this.firstName = ko.observable(first);
-	    this.lastName = ko.observable(last);
-	      
-	    this.fullName = ko.computed(function() {
-	        // Knockout は依存を自動的にトラッキングします。
-	        // fullName の評価中に firstName と lastName を呼び出すため、
-	        // それぞれに依存していることが検知されます。
-	        return this.firstName() + " " + this.lastName();
-	    }, this);
+	var GiftModel = function(gifts) {
+	    var self = this;
+	    self.gifts = ko.observableArray(gifts);
+	 
+	    self.addGift = function() {
+	        self.gifts.push({
+	            name: "",
+	            price: ""
+	        });
+	    };
+	 
+	    self.removeGift = function(gift) {
+	        self.gifts.remove(gift);
+	    };
+	 
+	    self.save = function(form) {
+	        alert("次のようにサーバに送信できます: " + ko.utils.stringifyJson(self.gifts));
+	        // ここで通常のフォーム送信同様に送信する場合、次のように書いてください:
+	        // ko.utils.postJson($("form")[0], self.gifts);
+	    };
 	};
 	 
-	// 次のコードで Knockout を起動します。
-	ko.applyBindings(new ViewModel("Planet", "Earth"));
+	var viewModel = new GiftModel([
+	    { name: "高帽子", price: "39.95"},
+	    { name: "長いクローク", price: "120.00"}
+	]);
+	ko.applyBindings(viewModel, document.getElementById('demo_1'));
+	 
+	// jQuery Validation を起動
+	$("form").validate({ submitHandler: viewModel.save });
 })();
